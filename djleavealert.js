@@ -68,6 +68,7 @@ var djleavealert = jarPlug.djleavealert = {
 				&& djleavealert.settings.djs.indexOf(me) == -1) {
 				djleavealert.beep();
 				djleavealert.flashBackground();
+				djleavealert.notify();
 			}
 		}
 		else {
@@ -80,6 +81,30 @@ var djleavealert = jarPlug.djleavealert = {
 		var element = document.getElementById('loud-beep');
 		element.load();
 		element.play();
+	},
+	notify: function () {
+		if(!window.webkitNotifications)
+			return;
+		console.log('popping notification');
+		var havePermission = window.webkitNotifications.checkPermission();
+		if (havePermission == 0) {
+			// 0 is PERMISSION_ALLOWED
+			var notification = window.webkitNotifications.createNotification(
+				  'http://i.stack.imgur.com/dmHl0.png',
+				  'Open spot alert!',
+				  'A DJ Spot has opened up in plug.dj!');
+			
+			notification.onclick = function () {
+			  window.focus();
+			  this.cancel();
+			}
+			notification.show();
+			setTimeout(function() {
+				notification.cancel();
+            }, 10000);
+		} else {
+		  window.webkitNotifications.requestPermission(djleavealert.notify);
+		} 
 	},
 	flashBackground: function() {
 		var flashes = 0;
